@@ -1,10 +1,12 @@
-package algafood.controller;
+package algafood.api.controller;
 
 
 import algafood.domain.model.Cozinha;
-import algafood.domain.model.Estado;
 import algafood.domain.repository.CozinhaRepository;
+import algafood.domain.service.CadastroCozinhaService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,21 +18,39 @@ public class CozinhaController {
     @Autowired
     private CozinhaRepository cozinhaRepository;
 
-    @GetMapping
-    public List<Cozinha> listar(){
-        return cozinhaRepository.listar();
-    }
+    @Autowired
+    private CadastroCozinhaService cadastroCozinhaService;
 
+    @GetMapping
+    public List<Cozinha> listarCozinhas() {
+        return cozinhaRepository.findAll();
+    }
 
     //fazendo Bind com cozinhaId
     @GetMapping("/{cozinhaId}")
-    public Cozinha buscar(@PathVariable Long cozinhaId){
-        return cozinhaRepository.buscar(cozinhaId);
+    public Cozinha buscarCozinha(@PathVariable Long cozinhaId) {
+        return cadastroCozinhaService.buscarOuFalhar(cozinhaId);
     }
 
     @PostMapping
-    public Cozinha salvar(Cozinha cozinha){
-        return cozinhaRepository.salvar(cozinha);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cozinha salvarCozinha(@RequestBody Cozinha cozinha) {
+        return cadastroCozinhaService.salvar(cozinha);
+    }
+
+    @PutMapping("/{cozinhaId}")
+    public Cozinha atualizarCozinha(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
+        Cozinha cozinhaAtual = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
+
+        BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+
+        return cadastroCozinhaService.salvar(cozinhaAtual);
+    }
+
+    @DeleteMapping("/{cozinhaId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remover(@PathVariable Long cozinhaId) {
+        cadastroCozinhaService.excluir(cozinhaId);
     }
 
 }
