@@ -1,7 +1,6 @@
 package algafood.domain.service;
 
 
-import algafood.domain.exception.EntidadeNaoEncontradaException;
 import algafood.domain.exception.RestauranteNaoEncontradoException;
 import algafood.domain.model.Cozinha;
 import algafood.domain.model.Restaurante;
@@ -9,8 +8,7 @@ import algafood.domain.repository.CozinhaRepository;
 import algafood.domain.repository.RestauranteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroRestauranteService {
@@ -24,6 +22,7 @@ public class CadastroRestauranteService {
     @Autowired
     private CozinhaRepository cozinhaRepository;
 
+    @Transactional
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
 

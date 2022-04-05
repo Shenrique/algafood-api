@@ -2,7 +2,6 @@ package algafood.domain.service;
 
 import algafood.domain.exception.CidadeNaoEncontradaException;
 import algafood.domain.exception.EntidadeEmUsoException;
-import algafood.domain.exception.EntidadeNaoEncontradaException;
 import algafood.domain.model.Cidade;
 import algafood.domain.model.Estado;
 import algafood.domain.repository.CidadeRepository;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroCidadeService {
@@ -23,6 +23,7 @@ public class CadastroCidadeService {
     @Autowired
     private CidadeRepository cidadeRepository;
 
+    @Transactional
     public Cidade salvar(Cidade cidade) {
 
         Long estadoId = cidade.getEstado().getId();
@@ -30,11 +31,11 @@ public class CadastroCidadeService {
         cidade.setEstado(estado);
         return cidadeRepository.save(cidade);
     }
-
+    @Transactional
     public void excluir(Long cidadeId) {
         try {
             cidadeRepository.deleteById(cidadeId);
-
+            cidadeRepository.flush();
         } catch (EmptyResultDataAccessException e) {
             throw new CidadeNaoEncontradaException(cidadeId);
 
